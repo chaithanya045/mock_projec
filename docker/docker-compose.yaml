@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  db:
+    restart: always
+    image: postgres:12.0-alpine
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=signalcrossingrestapi
+      - POSTGRES_USER=$POSTGRES_LOCAL_USER
+      - POSTGRES_PASSWORD=$POSTGRES_LOCAL_PASSWORD
+    env_file:
+      - ./.env
+  web:
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: .
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    env_file: .env
+    command: ./run.sh
+volumes:
+  postgres_data:
+    driver: local
